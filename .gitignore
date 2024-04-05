@@ -1,9 +1,15 @@
-HELP.md
+# Ignore build output directories
 target/
+build/
+
+# Exclude Maven Wrapper jar
 !.mvn/wrapper/maven-wrapper.jar
+
+# Exclude target directories within src/main and src/test
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+# IDE-specific exclusions
 ### STS ###
 .apt_generated
 .classpath
@@ -25,7 +31,8 @@ target/
 /dist/
 /nbdist/
 /.nb-gradle/
-build/
+
+# Exclude build directories within src/main and src/test
 !**/src/main/**/build/
 !**/src/test/**/build/
 
