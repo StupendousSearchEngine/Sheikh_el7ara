@@ -1,5 +1,6 @@
 package com.example.SheikhEl7ara;
 
+import org.springframework.core.env.Environment;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,6 @@ public class SheikhEl7araApplication {
 
 	@GetMapping
 	public ResponseEntity<String> hello(){
-		return new ResponseEntity<String>("Hello From Spring Boot", HttpStatus.OK);
+		return new ResponseEntity<String>("Hello from Spring Boot", HttpStatus.OK);
 	}
 }
