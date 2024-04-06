@@ -1,5 +1,7 @@
-package com.example.SheikhEl7ara;
+package com.example.SheikhEl7ara.Controller;
 
+import com.example.SheikhEl7ara.Word;
+import com.example.SheikhEl7ara.WordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
