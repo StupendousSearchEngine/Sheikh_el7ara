@@ -16,8 +16,4 @@ public class SheikhEl7araApplication {
 		SpringApplication.run(SheikhEl7araApplication.class, args);
 	}
 
-	@GetMapping
-	public ResponseEntity<String> hello(){
-		return new ResponseEntity<String>("Hello from Spring Boot", HttpStatus.OK);
-	}
 }
