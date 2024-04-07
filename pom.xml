@@ -52,6 +52,11 @@
 			<artifactId>jsoup</artifactId>
 			<version>1.17.2</version>
 		</dependency>
+		<dependency>
+			<groupId>commons-validator</groupId>
+			<artifactId>commons-validator</artifactId>
+			<version>1.8.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>
