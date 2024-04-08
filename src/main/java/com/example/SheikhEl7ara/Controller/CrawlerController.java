@@ -1,7 +1,7 @@
 package com.example.SheikhEl7ara.Controller;
 
 import com.example.SheikhEl7ara.Model.Word;
-import com.example.SheikhEl7ara.WordService;
+import com.example.SheikhEl7ara.Service.WordService;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;

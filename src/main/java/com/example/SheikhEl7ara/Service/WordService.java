@@ -1,4 +1,4 @@
-package com.example.SheikhEl7ara;
+package com.example.SheikhEl7ara.Service;
 
 import com.example.SheikhEl7ara.Model.Word;
 import com.example.SheikhEl7ara.Repository.WordRepository;
