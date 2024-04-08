@@ -1,4 +1,4 @@
-package com.example.SheikhEl7ara;
+package com.example.SheikhEl7ara.Model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

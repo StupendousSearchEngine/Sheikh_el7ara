@@ -1,6 +1,6 @@
 package com.example.SheikhEl7ara.Controller;
 
-import com.example.SheikhEl7ara.Word;
+import com.example.SheikhEl7ara.Model.Word;
 import org.springframework.http.HttpStatus;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
