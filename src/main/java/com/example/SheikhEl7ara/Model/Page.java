@@ -3,6 +3,7 @@ package com.example.SheikhEl7ara.Model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.jsoup.Connection;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -15,7 +16,7 @@ public class Page {
     @Id
     private String id;
     @Indexed(unique = true)
-    private String canonicalUrl;
+    private String normlizedUrl;
     private String url;
-    private String title;
+
 }
