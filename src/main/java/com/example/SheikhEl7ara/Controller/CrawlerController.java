@@ -26,13 +26,6 @@ public class CrawlerController {
 
     @PostMapping
     public ResponseEntity<String> appendToWordOccurrences(@RequestBody Map<String,String> payload){
-//        UrlValidator urlValidator = new UrlValidator();
-//        if (urlValidator.isValid(originalUrl)) {
-//            String normalizedUrl = originalUrl.split("\\?")[0];
-//            assertEquals(expectedNormalizedUrl, manuallyNormalizedUrl);
-//        } else {
-//            fail(originalUrl);
-//        }
         crawl(0,payload.get("url"),new ArrayList<String>());
         return new ResponseEntity<String>("Got it", HttpStatus.CREATED);
     }
