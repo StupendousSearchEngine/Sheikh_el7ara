@@ -11,4 +11,6 @@ import java.util.Optional;
 @Repository
 public interface PageRepository extends MongoRepository<Page, String> {
     Optional<Page> findByNormlizedUrl(String normlizedUrl);
+    @Query("{ 'isIndexed' : false }")
+    List<Page> findUnindexedPages();
 }

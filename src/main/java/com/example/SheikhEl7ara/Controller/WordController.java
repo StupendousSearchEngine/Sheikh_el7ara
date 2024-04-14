@@ -22,9 +22,9 @@ public class WordController {
         return new ResponseEntity<Optional<Word>>(wordService.singleWord(word), HttpStatus.OK);
     }
 
-    @PostMapping
+    /*@PostMapping
     public ResponseEntity<Word> appendToWordOccurrences(@RequestBody Map<String,String> payload){
         List<String> list = new ArrayList<>();
         return new ResponseEntity<Word>(wordService.appendOccurrence(payload.get("word"),payload.get("occ")), HttpStatus.CREATED);
-    }
+    }*/
 }

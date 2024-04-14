@@ -7,5 +7,5 @@ import java.util.List;
 import java.util.Optional;
 
 public interface WordRepository extends MongoRepository<Word,String> {
-    Optional<Word> findWordByword(String imdbId);
+    Optional<Word> findWordByword(String word);
 }

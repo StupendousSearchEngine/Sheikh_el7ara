@@ -83,6 +83,8 @@ public class CrawlerService {
                     Page page = new Page();
                     page.setUrl(url);
                     page.setNormlizedUrl(normlizedUrl);
+                    page.setPopularity(1);
+                    page.setIndexed(false);
                     System.out.println("saving page with normlized url:"+ normlizedUrl);
                     pageRepository.save(page);
                     System.out.println("done saving page with normlized url:"+ normlizedUrl);
@@ -109,7 +111,7 @@ public class CrawlerService {
         this.maxNumOfPages = maxNumOfPages;
         this.numOfThreads = numOfThreads;
         urlsToVisit.addAll(seeds);
-
+        System.out.println(numOfThreads+" : "+maxNumOfPages);
         ExecutorService executorService = Executors.newFixedThreadPool(numOfThreads);
         for (int i = 0; i < numOfThreads; i++) {
             executorService.submit(new CrawlerThread());

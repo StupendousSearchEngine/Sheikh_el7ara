@@ -34,6 +34,7 @@ public class CrawlerController {
 
     @PostMapping
     public void startCrawling(@RequestBody CrawlerRequest crawlerRequest){
+        System.out.println("Start Crawling");
         crawlerService.start(
                 crawlerRequest.getSeeds(),
                 crawlerRequest.getNumOfThreads(),
