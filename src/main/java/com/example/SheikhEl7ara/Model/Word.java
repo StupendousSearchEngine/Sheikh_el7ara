@@ -23,7 +23,7 @@ public class Word {
     @Id
     private String id;
 
-    @Indexed(unique = true) // Index for fast lookup
+    @Indexed(unique = true)
     private String word;
 
     private HashMap<String, ArrayList<Double>> TF_IDFandOccurrences;
