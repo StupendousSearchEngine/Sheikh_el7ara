@@ -10,7 +10,7 @@ import edu.stanford.nlp.pipeline.*;
 import edu.stanford.nlp.semgraph.*;
 import edu.stanford.nlp.trees.*;
 import java.util.*;
-
+import  com.example.SheikhEl7ara.Service.QueryHandler;
 import org.springframework.http.HttpStatus;
 
 import com.google.gson.Gson;
@@ -36,39 +36,7 @@ import edu.stanford.nlp.util.CoreMap;
 public class QueryHandlerController {
 
 
-    public static String findRoot(String searchWord) {
-        // creates a StanfordCoreNLP object, with POS tagging, lemmatization, NER, parsing, and coreference resolution
-        Properties props = new Properties();
-        props.setProperty("annotators", "tokenize, ssplit, pos, lemma");
-        StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
 
-
-
-
-        Annotation document = new Annotation(searchWord);
-        pipeline.annotate(document);
-        if (searchWord.endsWith("er") && searchWord.length() > 2) {
-            searchWord = searchWord.substring(0, searchWord.length()-2);
-
-        }
-
-
-        StringBuilder lemma= new StringBuilder();
-        List<CoreMap> sentences = document.get(CoreAnnotations.SentencesAnnotation.class);
-        for (CoreMap sent : sentences) {
-            for (CoreLabel token : sent.get(CoreAnnotations.TokensAnnotation.class)) {
-                // Get lemma
-                lemma.append(token.get(CoreAnnotations.LemmaAnnotation.class));
-
-            }
-        }
-
-
-        // Shutdown Stanford CoreNLP pipeline
-        pipeline.unmount();
-        return lemma.toString();
-
-    }
 
 
 
@@ -85,9 +53,9 @@ public class QueryHandlerController {
             Gson gson = new Gson();
 
 
-
+            QueryHandler queryHandler= new QueryHandler();
             System.out.println("Received text data: "+textData);
-            String stemmedSearchPhrase=findRoot(textData);
+            String stemmedSearchPhrase= QueryHandler.findRoot(textData);
             System.out.println("Search phrase after stripping "+stemmedSearchPhrase);
             String jsonResponse = gson.toJson("Data received and processed successfully. ");
 
