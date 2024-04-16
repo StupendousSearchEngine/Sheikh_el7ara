@@ -1,57 +1,23 @@
-package com.example.SheikhEl7ara;
+package com.example.crawlify.model;
+import java.util.*;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
-import java.util.List;
 
-@Document(collection = "words")
+@Document(collection = "word")
 @Data
-@AllArgsConstructor
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
+@Setter
 public class Word {
-
     @Id
     private String id;
-
-    @Indexed(unique = true) // Index for fast lookup
+    @Indexed(unique = true)
     private String word;
-
-    private List<String> occurrences;
-
-    public Word(String word, List<String> occurrences) {
-        this.word = word;
-        this.occurrences = occurrences;
-    }
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getWord() {
-        return word;
-    }
-
-    public void setWord(String word) {
-        this.word = word;
-    }
-
-    public List<String> getOccurrences() {
-        return occurrences;
-    }
-
-    public void setOccurrences(List<String> occurrences) {
-        this.occurrences = occurrences;
-    }
-
+    private HashMap<String, ArrayList<Double>> TF_IDFandOccurrences;
 
 }
