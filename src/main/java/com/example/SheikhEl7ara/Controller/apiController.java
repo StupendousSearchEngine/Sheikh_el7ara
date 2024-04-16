@@ -1,9 +1,9 @@
 package com.example.SheikhEl7ara.Controller;
 
 //<<<<<<< HEAD
-import com.example.SheikhEl7ara.Word;
+//import com.example.SheikhEl7ara.Word;
 //=======
-import com.example.SheikhEl7ara.Model.Word;
+//import com.example.SheikhEl7ara.Model.Word;
 //>>>>>>> origin/web-with-tested-api
 import org.springframework.http.HttpStatus;
 import com.google.gson.Gson;
