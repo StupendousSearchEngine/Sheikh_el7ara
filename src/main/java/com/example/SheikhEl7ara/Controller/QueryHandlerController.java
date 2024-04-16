@@ -34,12 +34,6 @@ import edu.stanford.nlp.util.CoreMap;
 
 @RestController
 public class QueryHandlerController {
-
-
-
-
-
-
     @CrossOrigin(origins = "http://127.0.0.1:5500")
     @PostMapping("/api/search")
 
