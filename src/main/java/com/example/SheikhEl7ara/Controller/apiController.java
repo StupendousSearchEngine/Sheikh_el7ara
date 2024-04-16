@@ -1,6 +1,10 @@
 package com.example.SheikhEl7ara.Controller;
 
+//<<<<<<< HEAD
 import com.example.SheikhEl7ara.Word;
+//=======
+import com.example.SheikhEl7ara.Model.Word;
+//>>>>>>> origin/web-with-tested-api
 import org.springframework.http.HttpStatus;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -13,10 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
+import org.springframework.web.bind.annotation.CrossOrigin;
 @RestController
+
 @RequestMapping("api")
 public class apiController {
+    @CrossOrigin(origins = "http://127.0.0.1:5500")
     @GetMapping("/{count}")
     public static ResponseEntity<String> generateResponse(@PathVariable int count) {
         List<DataItem> data = new ArrayList<>();

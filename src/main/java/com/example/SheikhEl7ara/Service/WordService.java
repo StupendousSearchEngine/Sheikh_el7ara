@@ -1,5 +1,7 @@
-package com.example.SheikhEl7ara;
+package com.example.SheikhEl7ara.Service;
 
+import com.example.SheikhEl7ara.Model.Word;
+import com.example.SheikhEl7ara.Repository.WordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
