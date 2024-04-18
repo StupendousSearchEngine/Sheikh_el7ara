@@ -53,6 +53,7 @@ public class QueryHandler {
     }
     public HashMap<String, String> queryReturn(String searchWord)
     {
+
         HashMap<String, ArrayList<Double>> queryReturns = new HashMap<>();
         String[] searchWords = searchWord.split("\\s+");
         System.out.println(Arrays.toString(searchWords));

@@ -38,11 +38,14 @@ import edu.stanford.nlp.util.CoreMap;
 @RequestMapping("/query")
 public class QueryHandlerController {
     private static QueryHandler queryHandler;
+    private static PhraseSearching phraseSearching;
 
 
     @Autowired
-    public QueryHandlerController(QueryHandler queryHandler) {
+    public QueryHandlerController(QueryHandler queryHandler, PhraseSearching phraseSearching) {
+        this.phraseSearching = phraseSearching;
         this.queryHandler = queryHandler;
+
     }
 
     @CrossOrigin(origins = "http://127.0.0.1:5500")
@@ -83,10 +86,22 @@ public class QueryHandlerController {
     @GetMapping("/{word}")
     public static ResponseEntity<Optional<HashMap<String, String>>> respondQuery(@PathVariable String word) {
         System.out.println("data in API");
+        word = word.replaceAll("\\s", "");
+        if (word.charAt(0)=='"')
+        {
+            return new ResponseEntity<Optional<HashMap<String, String>>>
+                    (Optional.ofNullable(phraseSearching.queryParser(word)), HttpStatus.OK);
+        }
+        else {
+            return new ResponseEntity<Optional<HashMap<String, String>>>
+                    (Optional.ofNullable(queryHandler.queryReturn(word)), HttpStatus.OK);
+        }
+    }
+    public static ResponseEntity<Optional<HashMap<String, String>>> respondPhrase(@PathVariable String word) {
+        System.out.println("data in API");
         return new ResponseEntity<Optional<HashMap<String, String>>>
                 (Optional.ofNullable(queryHandler.queryReturn(word)), HttpStatus.OK);
 
     }
-
 
 }

@@ -68,9 +68,13 @@
                     <img class="bi logoinsearch" width="100" height="100" role="img" aria-label="Bootstrap" src="./media/logownbg.png" />
                 </h1>
                 <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="Es2l Shiekh El Hara" aria-label="Search Bar" aria-describedby="button-addon2">
-                    <button class="btn btn-outline-secondary fonter" type="button" id="button-addon2">Search</button>
+                    <input type="text" class="form-control searchbar" id ="textInput" placeholder="Es2l Shiekh El Hara" aria-label="Search Bar" aria-describedby="button-addon2">
+                    
+                    <button class="btn btn-outline-secondary fonter" type="button" id="searchButton">Search</button>
+                    <ul class="dropdown-menu mt-5 col-10 bluetext" id="suggestionDropdown"> </ul>
+                   
                 </div>
+                
                 <div id="search-results" class="flex-shrink-0"></div>
                 <div class="col-12 col-md-auto">
                     <button type="button" class="btn btn-primary mt-3 " id="prev-page-btn">Prev Page</button>
@@ -78,6 +82,8 @@
                     
                 </div>
 <!-- Write list for displaying results -->
+        <script src="./jsfiles/dropdown.js"></script>
+        <script src="./jsfiles/searchbutton.js"></script>
         <script src="./jsfiles/getSearchResults.js"></script>
         </div>
     </div>

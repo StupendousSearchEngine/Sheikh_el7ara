@@ -28,9 +28,9 @@ public class PhraseController {
     }
 
     @GetMapping("/{word}")
-    public ResponseEntity<Optional<HashMap<String, ArrayList<Double>>>>
+    public ResponseEntity<Optional<HashMap<String, String>>>
     getWordOccurrences(@PathVariable String word){
-        return new ResponseEntity<Optional<HashMap<String,ArrayList<Double>>>>
+        return new ResponseEntity<Optional<HashMap<String,String>>>
                 (Optional.ofNullable(phraseSearching.queryParser(word)), HttpStatus.OK);
     }
 
