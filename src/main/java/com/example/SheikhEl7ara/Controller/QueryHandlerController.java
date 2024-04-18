@@ -1,4 +1,5 @@
 package com.example.SheikhEl7ara.Controller;
+import com.example.SheikhEl7ara.Service.PhraseSearching;
 import edu.stanford.nlp.io.*;
 import edu.stanford.nlp.pipeline.*;
 import edu.stanford.nlp.util.*;
@@ -11,6 +12,7 @@ import edu.stanford.nlp.semgraph.*;
 import edu.stanford.nlp.trees.*;
 import java.util.*;
 import  com.example.SheikhEl7ara.Service.QueryHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 import com.google.gson.Gson;
@@ -33,12 +35,19 @@ import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.util.CoreMap;
 
 @RestController
+@RequestMapping("/query")
 public class QueryHandlerController {
-    @CrossOrigin(origins = "http://127.0.0.1:5500")
-    @PostMapping("/api/search")
+    private static QueryHandler queryHandler;
 
-    public ResponseEntity<String> handleFormData(@RequestParam("textData") String textData)
-    {
+
+    @Autowired
+    public QueryHandlerController(QueryHandler queryHandler) {
+        this.queryHandler = queryHandler;
+    }
+
+    @CrossOrigin(origins = "http://127.0.0.1:5500")
+    @PostMapping("/search")
+    public ResponseEntity<String> handleFormData(@RequestParam("textData") String textData) {
         try {
 
             System.out.println("Received text data: " + textData);
@@ -47,10 +56,11 @@ public class QueryHandlerController {
             Gson gson = new Gson();
 
 
-            QueryHandler queryHandler= new QueryHandler();
-            System.out.println("Received text data: "+textData);
-            String stemmedSearchPhrase= QueryHandler.findRoot(textData);
-            System.out.println("Search phrase after stripping "+stemmedSearchPhrase);
+            //QueryHandler queryHandler= new QueryHandler();
+            System.out.println("Received text data: " + textData);
+            //String stemmedSearchPhrase= QueryHandler.findRoot(textData);
+
+
             String jsonResponse = gson.toJson("Data received and processed successfully. ");
 
             // Return a success response with JSON content type
@@ -69,6 +79,14 @@ public class QueryHandlerController {
 
     }
 
+    @CrossOrigin(origins = "http://127.0.0.1:5500")
+    @GetMapping("/{word}")
+    public static ResponseEntity<Optional<HashMap<String, String>>> respondQuery(@PathVariable String word) {
+        System.out.println("data in API");
+        return new ResponseEntity<Optional<HashMap<String, String>>>
+                (Optional.ofNullable(queryHandler.queryReturn(word)), HttpStatus.OK);
+
+    }
 
 
 }

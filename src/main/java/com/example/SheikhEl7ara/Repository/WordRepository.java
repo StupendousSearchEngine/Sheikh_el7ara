@@ -1,8 +1,7 @@
 package com.example.SheikhEl7ara.Repository;
 
-import com.example.SheikhEl7ara.Model.Word;
 import org.springframework.data.mongodb.repository.MongoRepository;
-
+import com.example.SheikhEl7ara.Model.Word;
 import java.util.List;
 import java.util.Optional;
 

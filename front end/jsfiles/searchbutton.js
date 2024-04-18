@@ -13,7 +13,7 @@ searchButton.addEventListener('click', function(event) {
     const formData = new FormData();
     formData.append('textData',searchTerm);
     console.log("mt"+searchTerm);
-    fetch('http://localhost:8080/api/search', {
+    fetch('http://localhost:8080/query/search', {
       method: 'POST',
       body: formData
     })
@@ -30,7 +30,7 @@ searchButton.addEventListener('click', function(event) {
     .catch(error => {
       console.error('There was a problem with the fetch operation:', error);
     });
-    //window.location.href = `results.html?searchTerm=${searchTerm}`;
+    window.location.href = `results.html?searchTerm=${searchTerm}`;
     
   }
   

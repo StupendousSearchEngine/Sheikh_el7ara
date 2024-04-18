@@ -1,7 +1,7 @@
 package com.example.SheikhEl7ara.Service;
 import com.example.SheikhEl7ara.Repository.PageRepository;
 import com.example.SheikhEl7ara.Repository.WordRepository;
-import javafx.util.Pair;
+//import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,12 @@ public class PhraseSearching {
     public HashMap<String, ArrayList<Double>> queryParser(String query) {
         HashMap<String, ArrayList<Double>> resultList = new HashMap<>();
         StringTokenizer tokenizer = new StringTokenizer(query);
+        int countToken=0;
+        //make a map of all urls vaild
+
+        HashMap<String, Set<Double>> allURLS= new HashMap<>();
         while (tokenizer.hasMoreTokens()) {
+            ++countToken;
             String token = tokenizer.nextToken();
             HashMap<String, ArrayList<Double>> tokenResult = rankerService.startRanking(token);
             resultList=tokenResult;
@@ -37,12 +42,53 @@ public class PhraseSearching {
 
             ignore the first element in the array if you care about positions only
              */
+            /*
+                start to do:
+                    - make a map of all urls (/)
+                    - if 1st token
+                        -add all urls to the map
+                        -add their respected positions in a set
+                            -map<url, set<positions>> of first element
+                        - keep count of which token
+                        - subtract position from first element's +1 (1 indexed)
+             */
+            if (countToken == 1)
+            {
+                for(String url : tokenResult.keySet()) {
+                    ArrayList<Double> firstPositions=tokenResult.get(url);
+                    Set<Double> dummyInsert = new HashSet<>(firstPositions);
+                    allURLS.put(url, dummyInsert);
 
+                }
+
+            }
+            else
+            {
+                for(String url :allURLS.keySet())
+                {
+                    if (!tokenResult.containsKey(url)) {
+                        allURLS.remove(url);
+                        continue;
+                    }
+                    for (int i=0;   i<tokenResult.get(url).size();  i++)
+                    {
+                        Double pos = tokenResult.get(url).get(i);
+                        if (!allURLS.get(url).contains(pos-countToken+1))
+                            allURLS.remove(url);
+                    }
+
+
+                }
+
+
+
+
+            }
 
             //add function to call ranker and get result
             //add result of ranker to a map
             //if not first token
-            //if map has result doc :
+            //if map ;has result doc :
             //find if position of token is equal position of prev token +1
             //if yes
             //continue

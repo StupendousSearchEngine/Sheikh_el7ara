@@ -8,9 +8,14 @@ let resultsList = [];
 let numPagesTotal=0; 
 
 async function getSearchResults() {
+  const currentURL = window.location.href;
 
+  // Extract search term from the URL
+  const urlSearchParams = new URLSearchParams(currentURL.split('?')[1]);
+  const searchTerm = urlSearchParams.get('searchTerm');
+  
   // Example JavaScript code to make an AJAX request
-fetch('http://localhost:8080/api/40')
+fetch(`http://localhost:8080/query/${searchTerm}`)
 .then(response => {
   if (!response.ok) {
     throw new Error('Network response was not ok');
@@ -24,11 +29,12 @@ fetch('http://localhost:8080/api/40')
   
 
   
-  const countItems=datta.count;
+  const countItems=Object.keys(datta).length;
   numPagesTotal=Math.ceil(countItems/10);
   let displayItems=countItems;
-  let myData= datta.data;
-
+  //let myData= datta.data;
+  let myData = Object.entries(datta);
+  
   console.log(numPagesTotal);
   for (let i=0;i<numPagesTotal;i++)
   {
@@ -40,8 +46,8 @@ fetch('http://localhost:8080/api/40')
     let result=[]
     for (let j=0;j<loopCounter;j++)
     {
-      
-      result.push( myData.shift());
+      const [firstKey, firstValue]= myData.shift();
+      result.push([firstKey,firstValue]);
       
     }
     resultsList.push(result);
@@ -63,10 +69,13 @@ let currentPage = 1;
 async function displaySearchResults() {
   searchResultsContainer.innerHTML = ''; // Clear previous results
   console.log(resultsList);
-
-    const myList=[...resultsList[currentPage-1]];
+  let myList =[];
+  print("results"+resultsList);
+    if (resultsList.length >0)
+      myList=[...resultsList[currentPage-1]];
     console.log("mylist"+myList)
     const listLenght=myList.length;
+    console.log(listLenght);
     for(let i=0;    i < listLenght;   i++) {
         
         result=myList.shift();
@@ -80,15 +89,19 @@ async function displaySearchResults() {
 
         const cardTitle = document.createElement('h5');
         cardTitle.classList.add('card-title');
-        cardTitle.textContent = result.title;
-
+        //cardTitle.textContent = result.title;
+      
+        console.log("result" + result);
         const cardLink = document.createElement('a');
         cardLink.classList.add('link');
-        cardLink.textContent = result.url;
+        //cardLink.textContent = result.url;
+        cardLink.textContent = result[0];
+        cardLink.href= result[0];
+
 
         const cardText = document.createElement('p');
         cardText.classList.add('card-text');
-        cardText.textContent = result.body;
+        cardText.textContent = result[1];
 
         cardBody.appendChild(cardTitle);
         cardBody.appendChild(cardLink);
@@ -114,7 +127,7 @@ nextPageBtn.addEventListener('click', () => {
     
     prevPageBtn.disabled = false; 
 }
-console.log(pageNumber);
+console.log(currentPage);
 });
 prevPageBtn.addEventListener('click',() =>{
 
@@ -129,5 +142,5 @@ prevPageBtn.addEventListener('click',() =>{
         nextPageBtn.disabled = false; // Disable button if no more pages
        
       }
-      console.log(pageNumber);
+      console.log(currentPage);
 })

@@ -30,7 +30,7 @@ public class RankerService {
         // Convert List<Pair<String, ArrayList<Double>>> to HashMap<String, ArrayList<Double>>
         HashMap<String, ArrayList<Double>> resultMap = new HashMap<>();
         for (Pair<String, ArrayList<Double>> pair : sortedPageFinalScore) {
-            resultMap.put(pair.getKey(), pair.getRight());
+            resultMap.put(pair.getKey(), pair.getValue());
         }
 
         return resultMap;
@@ -79,14 +79,14 @@ public class RankerService {
     }
     private void sortPagesByFinalScore() {
         sortedPageFinalScore.sort((p1, p2) -> {
-            double firstElementOfArray1 = p1.getRight().get(0);
-            double firstElementOfArray2 = p2.getRight().get(0);
+            double firstElementOfArray1 = p1.getValue().get(0);
+            double firstElementOfArray2 = p2.getValue().get(0);
             return Double.compare(firstElementOfArray2, firstElementOfArray1);
         });
     }    private void printPageFinalScore(){
         for(Pair<String,ArrayList<Double>> pair:sortedPageFinalScore){
 
-            System.out.println(pair.getKey()+"\t"+pair.getRight());
+            System.out.println(pair.getKey()+"\t"+pair.getValue());
         }
     }
 }
