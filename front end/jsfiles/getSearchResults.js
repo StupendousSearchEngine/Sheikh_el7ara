@@ -79,7 +79,12 @@ async function displaySearchResults() {
     for(let i=0;    i < listLenght;   i++) {
         
         result=myList.shift();
+        let url = result[0];
+        let content = result[1];
+        const path = url.split("/").pop();
 
+        // Convert the path to title format
+        const title = path.split("-").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
 
         const card = document.createElement('div');
         card.classList.add('card', 'mb-3');
@@ -90,18 +95,19 @@ async function displaySearchResults() {
         const cardTitle = document.createElement('h5');
         cardTitle.classList.add('card-title');
         //cardTitle.textContent = result.title;
+        cardTitle.textContent = title;
       
         console.log("result" + result);
         const cardLink = document.createElement('a');
         cardLink.classList.add('link');
         //cardLink.textContent = result.url;
-        cardLink.textContent = result[0];
-        cardLink.href= result[0];
+        cardLink.textContent = url;
+        cardLink.href= url;
 
 
         const cardText = document.createElement('p');
         cardText.classList.add('card-text');
-        cardText.textContent = result[1];
+        cardText.textContent = content;
 
         cardBody.appendChild(cardTitle);
         cardBody.appendChild(cardLink);
