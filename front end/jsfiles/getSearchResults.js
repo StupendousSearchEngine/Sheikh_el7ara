@@ -16,16 +16,58 @@ function truncateText(text, maxLength) {
   return text;
 }
 function makeWordBoldId(textElementId, wordToBold) {
-  wordToBold = wordToBold.replace(/['"]/g, "");
+  let pattern = /"([^"]*)"/g;
+
+  // Initialize an array to store the matched phrases
+  let matches = [];
   console.log(wordToBold);
   var textElement = document.getElementById(textElementId);
   var text = textElement.innerHTML;
+  let match;
+  while ((match = pattern.exec(wordToBold)) !== null) {
+    matches.push(match[1]);
+  }
+  if (
+    pattern.test(wordToBold) &&
+    matches[0] != undefined &&
+    matches[1] != undefined
+  ) {
+    // Extract the quoted phrases using match() method
 
-  var regex = new RegExp("\\b(" + wordToBold + ")\\b", "gi");
+    var regex = new RegExp("\\b(" + matches[0] + ")\\b", "gi");
 
-  var newText = text.replace(regex, "<b>$1</b>");
+    var newText = text.replace(regex, "<b>$1</b>");
 
-  textElement.innerHTML = newText;
+    textElement.innerHTML = newText;
+    if (matches[1] != undefined) {
+      var regex_1 = new RegExp("\\b(" + matches[1] + ")\\b", "gi");
+
+      var newText_1 = newText.replace(regex_1, "<b>$1</b>");
+
+      textElement.innerHTML = newText_1;
+    }
+  } else if (wordToBold.indexOf('"') !== -1) {
+    let newStr = wordToBold.replace(/"/g, "");
+    var regex = new RegExp("\\b(" + newStr + ")\\b", "gi");
+
+    var newText = text.replace(regex, "<b>$1</b>");
+
+    textElement.innerHTML = newText;
+  } else {
+    var newText;
+    var isset = 0;
+    let words = wordToBold.split(" ");
+    for (let i = 0; i < words.length; i++) {
+      console.log(words[i]);
+
+      var regex = new RegExp("\\b(" + words[i] + ")\\b", "gi");
+      if (i == 0 || !isset) {
+        newText = text.replace(regex, "<b>$1</b>");
+        isset = 1;
+      } else newText = newText.replace(regex, "<b>$1</b>");
+      textElement.innerHTML = newText;
+    }
+  }
 }
 
 async function getSearchResults() {
@@ -85,6 +127,7 @@ async function displaySearchResults() {
   const listLenght = myList.length;
   console.log(listLenght);
   for (let i = 0; i < listLenght; i++) {
+    console.log(listLenght);
     result = myList.shift();
     let url = result[0];
     let content = result[1];
@@ -117,7 +160,7 @@ async function displaySearchResults() {
 
     const cardText = document.createElement("p");
     cardText.classList.add("card-text");
-    cardText.id = "page_content";
+    cardText.id = `page_content_${i}`;
     cardText.innerHTML = truncateText(content, 700);
     //cardText.innerHTML = makeWordBold(cardText.innerHTML, searchTerm);
     cardBody.appendChild(cardTitle);
@@ -127,7 +170,7 @@ async function displaySearchResults() {
     card.appendChild(cardBody);
 
     searchResultsContainer.appendChild(card);
-    makeWordBoldId("page_content", searchTerm);
+    makeWordBoldId(cardText.id, searchTerm);
     searchResultsContainer.replaceChild(card, card);
   }
 }
