@@ -86,9 +86,12 @@ public class QueryHandlerController {
     @GetMapping("/{word}")
     public static ResponseEntity<Optional<HashMap<String, String>>> respondQuery(@PathVariable String word) {
         System.out.println("data in API");
-       // word = word.replaceAll("\\s", "");f
+        word=word.trim();
+        System.out.println("word after trim"+word);
         if (word.charAt(0)=='"')
         {
+            word = word.substring(1,word.length()-1);
+            System.out.println("word in query"+word);
             return new ResponseEntity<Optional<HashMap<String, String>>>
                     (Optional.ofNullable(phraseSearching.queryParser(word)), HttpStatus.OK);
         }
@@ -97,12 +100,6 @@ public class QueryHandlerController {
             return new ResponseEntity<Optional<HashMap<String, String>>>
                     (Optional.ofNullable(queryHandler.queryReturn(word)), HttpStatus.OK);
         }
-    }
-    public static ResponseEntity<Optional<HashMap<String, String>>> respondPhrase(@PathVariable String word) {
-        //System.out.println("data in API");
-        return new ResponseEntity<Optional<HashMap<String, String>>>
-                (Optional.ofNullable(queryHandler.queryReturn(word)), HttpStatus.OK);
-
     }
 
 }

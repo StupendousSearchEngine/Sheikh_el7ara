@@ -1,6 +1,7 @@
 const searchResultsContainer = document.getElementById("search-results");
 const nextPageBtn = document.getElementById("next-page-btn");
 const prevPageBtn = document.getElementById("prev-page-btn");
+var searchTerm;
 let resultsList = [];
 
 let numPagesTotal = 0;
@@ -14,15 +15,28 @@ function truncateText(text, maxLength) {
   }
   return text;
 }
+function makeWordBoldId(textElementId, wordToBold) {
+  wordToBold = wordToBold.replace(/['"]/g, "");
+  console.log(wordToBold);
+  var textElement = document.getElementById(textElementId);
+  var text = textElement.innerHTML;
+
+  var regex = new RegExp("\\b(" + wordToBold + ")\\b", "gi");
+
+  var newText = text.replace(regex, "<b>$1</b>");
+
+  textElement.innerHTML = newText;
+}
+
 async function getSearchResults() {
   const currentURL = window.location.href;
 
   // Extract search term from the URL
   const urlSearchParams = new URLSearchParams(currentURL.split("?")[1]);
-  const searchTerm = urlSearchParams.get("searchTerm");
+  searchTerm = urlSearchParams.get("searchTerm");
 
   // Example JavaScript code to make an AJAX request
-  fetch(`http://localhost:8080/query/${searchTerm}`)
+  fetch(`http://localhost:8080/query/${searchTerm};`)
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -74,6 +88,7 @@ async function displaySearchResults() {
     result = myList.shift();
     let url = result[0];
     let content = result[1];
+
     const path = url.split("/").pop();
 
     // Convert the path to title format
@@ -102,14 +117,18 @@ async function displaySearchResults() {
 
     const cardText = document.createElement("p");
     cardText.classList.add("card-text");
-    cardText.textContent = truncateText(content, 700);
-
+    cardText.id = "page_content";
+    cardText.innerHTML = truncateText(content, 700);
+    //cardText.innerHTML = makeWordBold(cardText.innerHTML, searchTerm);
     cardBody.appendChild(cardTitle);
     cardBody.appendChild(cardLink);
     cardBody.appendChild(cardText);
+
     card.appendChild(cardBody);
 
     searchResultsContainer.appendChild(card);
+    makeWordBoldId("page_content", searchTerm);
+    searchResultsContainer.replaceChild(card, card);
   }
 }
 
