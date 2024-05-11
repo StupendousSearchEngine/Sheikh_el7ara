@@ -147,7 +147,7 @@ public class QueryHandler {
             }
 
         }
-        System.out.println(allURLS);
+
         return (allURLS);
 
     }

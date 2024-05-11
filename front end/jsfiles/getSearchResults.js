@@ -1,5 +1,6 @@
 const searchResultsContainer = document.getElementById("search-results");
 const nextPageBtn = document.getElementById("next-page-btn");
+
 const prevPageBtn = document.getElementById("prev-page-btn");
 var searchTerm;
 let resultsList = [];
@@ -76,6 +77,7 @@ async function getSearchResults() {
   // Extract search term from the URL
   const urlSearchParams = new URLSearchParams(currentURL.split("?")[1]);
   searchTerm = urlSearchParams.get("searchTerm");
+  document.getElementById("textInput").placeholder = searchTerm;
 
   // Example JavaScript code to make an AJAX request
   fetch(`http://localhost:8080/query/${searchTerm};`)
@@ -96,9 +98,11 @@ async function getSearchResults() {
 
       console.log(numPagesTotal);
       for (let i = 0; i < numPagesTotal; i++) {
-        loopCounter = 0;
-        if (displayItems > 10) loopCounter = 10;
-        else loopCounter = displayItems;
+        let loopCounter = 0;
+        if (displayItems > 10) {
+          loopCounter = 10;
+          displayItems -= 10;
+        } else loopCounter = displayItems;
         let result = [];
         for (let j = 0; j < loopCounter; j++) {
           const [firstKey, firstValue] = myData.shift();
@@ -128,7 +132,7 @@ async function displaySearchResults() {
   console.log(listLenght);
   for (let i = 0; i < listLenght; i++) {
     console.log(listLenght);
-    result = myList.shift();
+    let result = myList.shift();
     let url = result[0];
     let content = result[1];
 
@@ -173,6 +177,13 @@ async function displaySearchResults() {
     makeWordBoldId(cardText.id, searchTerm);
     searchResultsContainer.replaceChild(card, card);
   }
+  const Mtime_m = localStorage.getItem("Mtime_minutes");
+  const Mtime_s = localStorage.getItem("Mtime_seconds");
+  let now = new Date();
+  let min = now.getMinutes() - Mtime_m;
+  let sec = now.getSeconds() - Mtime_s;
+  let time = `Search time is: Minutes: ${min} Seconds: ${sec}`;
+  document.getElementById("time").textContent = time;
 }
 
 getSearchResults();

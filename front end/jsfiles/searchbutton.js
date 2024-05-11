@@ -1,36 +1,38 @@
-const searchForm = document.getElementById('textInput');
-const searchButton = document.getElementById('searchButton');
-searchButton.addEventListener('click', function(event) {
-    event.preventDefault(); 
-    const searchTerm =  document.getElementById('textInput').value;
-    console.log("text val"+searchTerm);
-    if(searchTerm.length>0)
-        handleSearch(searchTerm);
-  });
-  
-  async function handleSearch(searchTerm) {
+const searchForm = document.getElementById("textInput");
+const searchButton = document.getElementById("searchButton");
+export let Mtime = new Date();
+searchButton.addEventListener("click", function (event) {
+  event.preventDefault();
+  const searchTerm = document.getElementById("textInput").value;
+  console.log("text val" + searchTerm);
+  if (searchTerm.length > 0) {
+    handleSearch(searchTerm);
+    Mtime = new Date();
+    localStorage.setItem("Mtime_minutes", Mtime.getMinutes());
+    localStorage.setItem("Mtime_seconds", Mtime.getSeconds());
+  }
+});
 
-    const formData = new FormData();
-    formData.append('textData',searchTerm);
-    console.log("mt"+searchTerm);
-    fetch('http://localhost:8080/query/search', {
-      method: 'POST',
-      body: formData
-    })
-    .then(response => {
+async function handleSearch(searchTerm) {
+  const formData = new FormData();
+  formData.append("textData", searchTerm);
+  console.log("mt" + searchTerm);
+  fetch("http://localhost:8080/query/search", {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => {
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error("Network response was not ok");
       }
       return response.json();
     })
-    .then(data => {
+    .then((data) => {
       // Handle the response from the backend
       console.log(data);
     })
-    .catch(error => {
-      console.error('There was a problem with the fetch operation:', error);
+    .catch((error) => {
+      console.error("There was a problem with the fetch operation:", error);
     });
-    window.location.href = `results.html?searchTerm=${searchTerm}`;
-    
-  }
-  
+  window.location.href = `results.html?searchTerm=${searchTerm}`;
+}
