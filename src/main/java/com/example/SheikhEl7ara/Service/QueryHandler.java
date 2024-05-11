@@ -1,15 +1,25 @@
 package com.example.SheikhEl7ara.Service;
 import edu.stanford.nlp.ling.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.util.CoreMap;
 import edu.stanford.nlp.util.Pair;
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
 
 import com.example.SheikhEl7ara.Repository.PageRepository;
@@ -51,41 +61,93 @@ public class QueryHandler {
         return lemma.toString();
 
     }
+    public static int countLines(StringBuilder sb) {
+        int count = 0;
+        int length = sb.length();
+        for (int i = 0; i < length; i++) {
+            if (sb.charAt(i) == '\n') {
+                count++;
+            }
+        }
+        // Add 1 to count the last line if it doesn't end with a newline character
+        if (length > 0 && sb.charAt(length - 1) != '\n') {
+            count++;
+        }
+        return count;
+    }
     public HashMap<String, String> queryReturn(String searchWord)
     {
 
-        HashMap<String, ArrayList<Double>> queryReturns = new HashMap<>();
+        HashMap<String, ArrayList<Double>> queryReturns;
         String[] searchWords = searchWord.split("\\s+");
         System.out.println(Arrays.toString(searchWords));
         HashMap<String, String> allURLS= new HashMap<>();
         for (int i = 0; i < searchWords.length; i++)
         {
             //add this for now and try to modify it later as a list
-            if (searchWords[i].matches(".*\\d+.*"))
+            /*if (searchWords[i].matches(".*\\d+.*"))
                 queryReturns=this.rankerService.startRanking(searchWords[i]);
-            else
-                queryReturns=this.rankerService.startRanking(findRoot(searchWords[i]));
-            if (i==0) {
-                for (String key : queryReturns.keySet())
-                    allURLS.put(key, "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla pretium urna vel sapien blandit, quis eleifend velit tristique. Aliquam erat volutpat. Nullam dignissim ligula a libero dictum, id tristique mi venenatis. Duis ut nunc metus. Vestibulum tempor, elit et luctus commodo, nunc libero vestibulum justo, non interdum tortor est vel risus. Fusce porttitor eros nec erat malesuada bibendum. Nunc ut nisl id turpis accumsan mattis. Nam vel metus id ipsum elementum eleifend. Nulla suscipit massa nec justo condimentum, quis tincidunt mi fermentum. Nam eget diam nec magna congue facilisis. Maecenas consectetur risus id metus fringilla eleifend. Sed at elit nec libero sodales pharetra. Suspendisse commodo tempor fringilla. Phasellus faucibus, lorem a vestibulum hendrerit, libero est dictum enim, nec viverra justo nisl nec mi.\n" +
-                            "\n" +
-                            "Maecenas quis nunc vitae nunc sodales tincidunt a quis sapien. Curabitur accumsan risus eget elit faucibus, ac fermentum turpis lacinia. Cras quis risus vitae odio consequat dapibus. Morbi in elit ipsum. Suspendisse potenti. Pellentesque nec lectus ultricies, lobortis ligula nec, bibendum metus. Ut vitae vehicula enim, nec dictum est. Nulla facilisi. Ut id odio et nulla ullamcorper vehicula. Integer placerat elit id ipsum varius laoreet. Vivamus eu pharetra elit. Donec tempus orci et nunc viverra, vel cursus ipsum vestibulum. Integer varius, lorem ut tincidunt fermentum, massa arcu pharetra nunc, non faucibus quam tellus et felis.\n" +
-                            "\n" +
-                            "Suspendisse potenti. Aliquam aliquet feugiat mauris vitae vestibulum. Morbi ut purus a sapien vehicula faucibus. Phasellus mattis metus vel tortor hendrerit, id consequat nulla varius. Aenean vel bibendum sapien, a ultrices elit. Integer a accumsan nunc. Fusce sed consectetur velit, nec congue dui. Maecenas fermentum scelerisque nulla, non venenatis sapien finibus in. Curabitur euismod, elit sit amet maximus pharetra, sapien turpis rhoncus odio, a lacinia mi urna et nulla. Vivamus suscipit libero vel convallis vestibulum. Curabitur vitae magna ac erat dictum consectetur.\n");
-            }
-            else
-            {
-                Iterator<String> iterator = allURLS.keySet().iterator();
-                while (iterator.hasNext()) {
-                    String key = iterator.next();
-                    if (!queryReturns.containsKey(key)) {
-                        iterator.remove();
-                    }
+            else*/
+            queryReturns=this.rankerService.startRanking(findRoot(searchWords[i]));
+
+            for (String key : queryReturns.keySet()) {
+                System.out.println(key);
+
+
+                Connection connect = Jsoup.connect(key);
+
+                Document  document = null;
+                try {
+                    document = connect.get();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
+
+                String html = document.html();
+                Document doc = Jsoup.parse(html);
+
+                // Extract the body content
+                Element body = doc.body();
+
+                // Convert the body content back to a string if needed
+                Elements paragraphs = body.select("p");
+
+                StringBuilder bodyString = new StringBuilder();
+                // Iterate through <p> elements and extract their text
+                Pattern pattern = Pattern.compile(searchWords[i]);
+                Pattern pattern_processed = Pattern.compile(findRoot(searchWords[i]));
+
+
+
+                for (Element paragraph : paragraphs) {
+                    String paragraphText = paragraph.text();
+                    Matcher matcher = pattern.matcher(paragraphText);
+                    Matcher matcher_processed = pattern_processed.matcher(paragraphText);
+                    if (matcher.find() || matcher_processed.find()) {
+                        bodyString.append(paragraphText).append("\n");
+
+                    }
+
+                }
+                if (bodyString.length()==0)
+
+                    for (Element p :paragraphs)
+                    {
+                        if (p.text().length()!=0) {
+                            bodyString.append(p.text());
+
+                        }
+
+                    }
+
+
+                allURLS.put(key, bodyString.toString());
+
 
             }
 
         }
+        System.out.println(allURLS);
         return (allURLS);
 
     }

@@ -78,8 +78,10 @@ public class CrawlerService {
                             System.out.println("not an html page line number 78");
                             continue;
                         }
+                        System.out.println("CONNECTION"+connection.response().body());
                     }
-
+                    System.out.println("HERE");
+                    System.out.println("CONNECTION"+connection.response());
                     Page page = new Page();
                     page.setUrl(url);
                     page.setNormlizedUrl(normlizedUrl);

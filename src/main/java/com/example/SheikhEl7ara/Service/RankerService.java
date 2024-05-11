@@ -32,7 +32,7 @@ public class RankerService {
         for (Pair<String, ArrayList<Double>> pair : sortedPageFinalScore) {
             resultMap.put(pair.getKey(), pair.getValue());
         }
-
+        System.out.println(resultMap);
         return resultMap;
     }
     private void calculatePageFinalTF_IDF(String relevantWord) {

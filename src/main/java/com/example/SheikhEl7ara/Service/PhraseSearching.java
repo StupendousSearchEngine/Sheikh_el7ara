@@ -16,6 +16,7 @@ public class PhraseSearching {
         this.rankerService=rankerService;
     }
     public HashMap<String, String> queryParser(String query) {
+        System.out.println(query);
         query = query.substring(1,query.length()-1);
         System.out.println("search word "+query);
         HashMap<String, String> resultList = new HashMap<>();

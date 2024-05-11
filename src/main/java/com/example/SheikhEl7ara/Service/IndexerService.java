@@ -134,6 +134,7 @@ public class IndexerService {
 
         private Matcher createMatcherFromHTML(String htmlContent) {
             htmlContent = htmlContent.replaceAll("<[^>]*>", "");
+            //System.out.println(htmlContent);
             Pattern pattern = Pattern.compile("\\w+");
             return pattern.matcher(htmlContent);
         }
