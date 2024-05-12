@@ -1,15 +1,8 @@
 package com.example.SheikhEl7ara.Controller;
 import com.example.SheikhEl7ara.Service.PhraseSearching;
-import edu.stanford.nlp.io.*;
-import edu.stanford.nlp.pipeline.*;
-import edu.stanford.nlp.util.*;
+
 import com.example.SheikhEl7ara.Model.Word;
-import edu.stanford.nlp.coref.data.CorefChain;
-import edu.stanford.nlp.ling.*;
-import edu.stanford.nlp.ie.util.*;
-import edu.stanford.nlp.pipeline.*;
-import edu.stanford.nlp.semgraph.*;
-import edu.stanford.nlp.trees.*;
+
 import java.util.*;
 import  com.example.SheikhEl7ara.Service.QueryHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,16 +16,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.MediaType;
 import java.util.ArrayList;
-import edu.stanford.nlp.pipeline.Annotation;
-import edu.stanford.nlp.pipeline.StanfordCoreNLP;
-import edu.stanford.nlp.ling.CoreAnnotations;
-import edu.stanford.nlp.util.CoreMap;
+
 
 import java.util.List;
 import java.util.Properties;
-import edu.stanford.nlp.ling.CoreAnnotations;
-import edu.stanford.nlp.pipeline.StanfordCoreNLP;
-import edu.stanford.nlp.util.CoreMap;
+
 
 @RestController
 @RequestMapping("/query")
