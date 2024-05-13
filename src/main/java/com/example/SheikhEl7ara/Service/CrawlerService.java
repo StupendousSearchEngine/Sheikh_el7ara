@@ -110,10 +110,10 @@ public class CrawlerService {
                     newPage.setPopularity(1);
                     System.out.println("saving page with normlized url:"+ normlizedUrl);
                     pageRepository.save(newPage);
-                    JsonObject newJsonObject = new JsonObject();
-                    newJsonObject.addProperty("url",normlizedUrl);
-                    newJsonObject.addProperty("html",document.html());
-                    jsonObjectList.add(newJsonObject);
+//                    JsonObject newJsonObject = new JsonObject();
+//                    newJsonObject.addProperty("url",normlizedUrl);
+//                    newJsonObject.addProperty("html",document.html());
+//                    jsonObjectList.add(newJsonObject);
 
                     System.out.println("done saving page with normlized url:"+ normlizedUrl);
                     visitedUrls.put(normlizedUrl,true);
@@ -131,28 +131,26 @@ public class CrawlerService {
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
-                System.out.println("fiiiikkkkkkiiiiiiiiiiiii");
             }
-            System.out.println("fiiiiiiiiiiiiiiiii");
             return;
         }
     }
 
     public void start(List<String> seeds, int numOfThreads, int maxNumOfPages) throws InterruptedException, IOException {
-        FileReader reader = new FileReader("data.json");
-
-        // Parse the JSON array
-        JsonArray jsonArray = JsonParser.parseReader(reader).getAsJsonArray();
-
-        // Create a list to hold JSON objects
-        jsonObjectList = new ArrayList<>();
-
-        // Add existing objects from JSON array to the list
-        for (JsonElement element : jsonArray) {
-            if (element.isJsonObject()) {
-                jsonObjectList.add(element.getAsJsonObject());
-            }
-        }
+//        FileReader reader = new FileReader("data.json");
+//
+//        // Parse the JSON array
+//        JsonArray jsonArray = JsonParser.parseReader(reader).getAsJsonArray();
+//
+//        // Create a list to hold JSON objects
+//        jsonObjectList = new ArrayList<>();
+//
+//        // Add existing objects from JSON array to the list
+//        for (JsonElement element : jsonArray) {
+//            if (element.isJsonObject()) {
+//                jsonObjectList.add(element.getAsJsonObject());
+//            }
+//        }
 
         this.maxNumOfPages = maxNumOfPages;
         this.numOfThreads = numOfThreads;
@@ -167,18 +165,18 @@ public class CrawlerService {
                     latch.countDown(); // Count down when thread finishes
                 }
             });
-            Thread.sleep(1000); // Sleep between thread submissions
+            Thread.sleep(200); // Sleep between thread submissions
         }
         latch.await(); // Wait for all threads to finish
-        JsonArray updatedArray = new JsonArray();
-        for (JsonObject obj : jsonObjectList) {
-            updatedArray.add(obj);
-        }
-
-        // Write the updated JSON array back to the file
-        FileWriter writer = new FileWriter("data.json");
-        writer.write(updatedArray.toString());
-        writer.close();
+//        JsonArray updatedArray = new JsonArray();
+//        for (JsonObject obj : jsonObjectList) {
+//            updatedArray.add(obj);
+//        }
+//
+//        // Write the updated JSON array back to the file
+//        FileWriter writer = new FileWriter("data.json");
+//        writer.write(updatedArray.toString());
+//        writer.close();
 
         System.out.println("File updated successfully.");
     }
