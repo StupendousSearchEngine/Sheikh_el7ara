@@ -3,8 +3,6 @@ package com.example.SheikhEl7ara.Service;
 import com.example.SheikhEl7ara.Model.Page;
 import com.example.SheikhEl7ara.Repository.PageRepository;
 import com.google.gson.*;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -87,11 +85,11 @@ public class CrawlerService {
                         continue;
                     }
 
-                    Optional<Page> page = pageRepository.findByNormlizedUrl(normlizedUrl);
+                    Page page = pageRepository.findByNormlizedUrl(normlizedUrl);
                     // if we added the page in the DB in previous crawl
-                    if(page.isPresent()){
-                        page.get().setPopularity(page.get().getPopularity()+1);
-                        pageRepository.save(page.get());
+                    if(page!=null){
+                        page.setPopularity(page.getPopularity()+1);
+                        pageRepository.save(page);
                         continue;
                     }
 
@@ -108,12 +106,9 @@ public class CrawlerService {
                     newPage.setUrl(url);
                     newPage.setNormlizedUrl(normlizedUrl);
                     newPage.setPopularity(1);
+                    newPage.setHtml(document.body().select("p").text());
                     System.out.println("saving page with normlized url:"+ normlizedUrl);
                     pageRepository.save(newPage);
-//                    JsonObject newJsonObject = new JsonObject();
-//                    newJsonObject.addProperty("url",normlizedUrl);
-//                    newJsonObject.addProperty("html",document.html());
-//                    jsonObjectList.add(newJsonObject);
 
                     System.out.println("done saving page with normlized url:"+ normlizedUrl);
                     visitedUrls.put(normlizedUrl,true);
@@ -167,16 +162,7 @@ public class CrawlerService {
             });
             Thread.sleep(200); // Sleep between thread submissions
         }
-        latch.await(); // Wait for all threads to finish
-//        JsonArray updatedArray = new JsonArray();
-//        for (JsonObject obj : jsonObjectList) {
-//            updatedArray.add(obj);
-//        }
-//
-//        // Write the updated JSON array back to the file
-//        FileWriter writer = new FileWriter("data.json");
-//        writer.write(updatedArray.toString());
-//        writer.close();
+        latch.await(); // Wait for all threads to finish`-```````````
 
         System.out.println("File updated successfully.");
     }

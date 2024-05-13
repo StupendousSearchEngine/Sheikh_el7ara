@@ -1,4 +1,5 @@
 package com.example.SheikhEl7ara.Service;
+import com.example.SheikhEl7ara.Model.Page;
 import edu.stanford.nlp.ling.*;
 
 import java.io.IOException;
@@ -33,10 +34,15 @@ import java.util.*;
 @Service
 public class QueryHandler {
     private final RankerService rankerService;
+    private final PageRepository pageRepository;
+
+
+
     @Autowired
     public QueryHandler (RankerService rankerService, PageRepository pageRepository,WordRepository wordRepository)
     {
         this.rankerService=rankerService;
+        this.pageRepository = pageRepository;
     }
     public static String findRoot(String searchWord) {
         // creates a StanfordCoreNLP object, with POS tagging, lemmatization, NER, parsing, and coreference resolution
@@ -93,55 +99,36 @@ public class QueryHandler {
             for (String key : queryReturns.keySet()) {
                 System.out.println(key);
 
+                Page p = pageRepository.findByNormlizedUrl(key);
 
-                Connection connect = Jsoup.connect(key);
+                String bodyString = "";
+                bodyString = p.getHtml();
+//                Document doc = Jsoup.parse(html);
 
-                Document  document = null;
-                try {
-                    document = connect.get();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
 
-                String html = document.html();
-                Document doc = Jsoup.parse(html);
 
-                // Extract the body content
-                Element body = doc.body();
 
-                // Convert the body content back to a string if needed
-                Elements paragraphs = body.select("p");
-
-                StringBuilder bodyString = new StringBuilder();
+//                StringBuilder bodyString = new StringBuilder();
                 // Iterate through <p> elements and extract their text
                 Pattern pattern = Pattern.compile(searchWords[i]);
                 Pattern pattern_processed = Pattern.compile(findRoot(searchWords[i]));
 
 
 
-                for (Element paragraph : paragraphs) {
-                    String paragraphText = paragraph.text();
-                    Matcher matcher = pattern.matcher(paragraphText);
-                    Matcher matcher_processed = pattern_processed.matcher(paragraphText);
-                    if (matcher.find() || matcher_processed.find()) {
-                        bodyString.append(paragraphText).append("\n");
-
-                    }
-
-                }
-                if (bodyString.length()==0)
-
-                    for (Element p :paragraphs)
-                    {
-                        if (p.text().length()!=0) {
-                            bodyString.append(p.text());
-
-                        }
-
-                    }
+//                for (Element paragraph : paragraphs) {
+//                    String paragraphText = paragraph.text();
+//                    Matcher matcher = pattern.matcher(paragraphText);
+//                    Matcher matcher_processed = pattern_processed.matcher(paragraphText);
+//                    if (matcher.find() || matcher_processed.find()) {
+//                        bodyString.append(paragraphText).append("\n");
+//
+//                    }
+//
+//                }
 
 
-                allURLS.put(key, bodyString.toString());
+
+                allURLS.put(key, bodyString);
 
 
             }

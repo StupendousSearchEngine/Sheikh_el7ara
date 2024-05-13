@@ -58,14 +58,14 @@ public class RankerService {
         }
     }
     private void calculatePageFinalTotalScore(){
-        Optional<Page> page;
+        Page page;
         int pagePopularity;
         double pageFinalScore,pageTF_IDF;
         for(Map.Entry<String,ArrayList<Double>>pairOfURLAndTF_IDF : pageTF_IDFScoreHashMap.entrySet()){
             pageTF_IDF = pairOfURLAndTF_IDF.getValue().get(0);
             page = pageRepository.findByNormlizedUrl(pairOfURLAndTF_IDF.getKey());
-            if(page.isPresent()){
-                pagePopularity = page.get().getPopularity();
+            if(page!=null){
+                pagePopularity = page.getPopularity();
                 pageFinalScore = (pagePopularity*pageTF_IDF)/(pagePopularity+pageTF_IDF);
                 ArrayList<Double>arrayList=new ArrayList<>();
                 arrayList.add(pageFinalScore);

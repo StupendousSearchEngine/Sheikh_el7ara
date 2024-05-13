@@ -18,6 +18,7 @@ public class Page {
     @Indexed(unique = true)
     private String normlizedUrl;
     private String url;
+    private String html;
     private boolean isIndexed;
     private int popularity;
 
