@@ -19,8 +19,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class IndexerService {
-    private int numThreads;
-    private int totalNoOfPages;
+    private int numOfThreads;
+    private int totalNumberOfPages;
     private final WordRepository wordRepository;
     private final PageRepository pageRepository;
     private static final ConcurrentHashMap<String, HashMap<String, ArrayList<Double>>> invertedIndex = new ConcurrentHashMap<>();
@@ -30,47 +30,47 @@ public class IndexerService {
         this.pageRepository = pageRepository;
         this.wordRepository = wordRepository;
     }
-    public void setIndexerThreads(int numThreads) {
-        this.numThreads = numThreads;
+    public void setIndexerThreads(int numOfThreads) {
+        this.numOfThreads = numOfThreads;
     }
 
     public void startIndexing(){
         List<Page> pageList = pageRepository.findUnindexedPages();
-        totalNoOfPages = pageList.size();
-        System.out.println("Started Indexing " + totalNoOfPages + " pages");
+        totalNumberOfPages = pageList.size();
+        System.out.println("Started Indexing " + totalNumberOfPages + " pages");
         if(pageList.isEmpty()) return;
 
-        Thread[] threads = new Thread[numThreads];
+        Thread[] Indexingthreads = new Thread[numOfThreads];
 
-        for (int i = 0; i < numThreads; i++) {
-            int start = i * pageList.size() / numThreads;
-            int end = (i + 1) * pageList.size() / numThreads;
-            threads[i] = new Thread(new IndexerThread(pageList.subList(start, end)));
-            threads[i].setName(Integer.toString(i));
-            threads[i].start();
+        for (int i = 0; i < numOfThreads; i++) {
+            int startIndex = i * pageList.size() / numOfThreads;
+            int endIndex = (i + 1) * pageList.size() / numOfThreads;
+            Indexingthreads[i] = new Thread(new IndexerThread(pageList.subList(startIndex, endIndex)));
+            Indexingthreads[i].setName(Integer.toString(i));
+            Indexingthreads[i].start();
         }
 
-        for (int i = 0; i < numThreads; i++) {
+        for (int i = 0; i < numOfThreads; i++) {
             try {
-                threads[i].join();
+                Indexingthreads[i].join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
 
-        Thread[] scoringThreads = new Thread[numThreads];
+        Thread[] scoringThreads = new Thread[numOfThreads];
 
         ArrayList<String> invertedIndexWords = new ArrayList<>(invertedIndex.keySet());
 
-        for (int i = 0; i < numThreads; i++) {
-            int start = i * invertedIndexWords.size() / numThreads;
-            int end = (i + 1) * invertedIndexWords.size() / numThreads;
-            scoringThreads[i] = new Thread(new ScoringThread(invertedIndexWords.subList(start, end)));
+        for (int i = 0; i < numOfThreads; i++) {
+            int startIndex = i * invertedIndexWords.size() / numOfThreads;
+            int endIndex = (i + 1) * invertedIndexWords.size() / numOfThreads;
+            scoringThreads[i] = new Thread(new ScoringThread(invertedIndexWords.subList(startIndex, endIndex)));
             scoringThreads[i].setName(Integer.toString(i));
             scoringThreads[i].start();
         }
 
-        for (int i = 0; i < numThreads; i++) {
+        for (int i = 0; i < numOfThreads; i++) {
             try {
                 scoringThreads[i].join();
             } catch (InterruptedException e) {
@@ -101,11 +101,11 @@ public class IndexerService {
                     if(connect==null)continue;
                    Document  document = connect.get();
 
-                String html = document.html();
-                if (html == null) return;
+                String bodyText = document.body().text();
+                if (bodyText == null) return;
                 String URL = currPage.getNormlizedUrl();
                 URL = URL.replace(".", "__");
-                Matcher matcher = createMatcherFromHTML(html);
+                Matcher matcher = createMatcherFromText(bodyText);
                 processWords(matcher, URL);
                 calculateTF(URL);
                 currPage.setIndexed(true);
@@ -123,20 +123,26 @@ public class IndexerService {
                 totalNoWordsInADocument++;
                 String word = wordProcessor.changeWordToLowercase(matcher.group()).toLowerCase();
                 if (!Objects.equals(wordProcessor.removeStopWords(word), "")) {
-                    word = wordProcessor.wordStemmer(word);
+                    String stemWord = wordProcessor.wordStemmer(word);
                     calculateWordFrequency(word);
                     addToInvertedIndex(word, URL, position);
                     words.add(word);
+                    calculateWordFrequency(stemWord);
+                    addToInvertedIndex(stemWord, URL, position);
+                    words.add(stemWord);
+                  //  System.out.println(word+" : "+stemWord);
                 }
                 position++;
             }
         }
 
-        private Matcher createMatcherFromHTML(String htmlContent) {
-            htmlContent = htmlContent.replaceAll("<[^>]*>", "");
-            //System.out.println(htmlContent);
+        private Matcher createMatcherFromText(String textContent) {
+            textContent = textContent.replaceAll("<[^>]*>", "");
+            textContent = textContent .replaceAll("\\d", "");
+            //System.out.println("Body Content: ");
+           // System.out.println(htmlContent);
             Pattern pattern = Pattern.compile("\\w+");
-            return pattern.matcher(htmlContent);
+            return pattern.matcher(textContent);
         }
         private void calculateWordFrequency(String word) {
             if (wordFrequency.containsKey(word))
@@ -194,7 +200,7 @@ public class IndexerService {
                 word = invertedIndexWord;
 
                 innerMap = invertedIndex.get(word);
-                IDF = Math.log(totalNoOfPages / (double) innerMap.size());
+                IDF = Math.log(totalNumberOfPages / (double) innerMap.size());
                 for (Map.Entry<String, ArrayList<Double>> document : innerMap.entrySet()) {
                     documentName = document.getKey();
                     TF = document.getValue().get(0);
