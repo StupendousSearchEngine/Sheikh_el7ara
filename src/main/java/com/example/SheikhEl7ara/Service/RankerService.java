@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 
 
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
+
 @Service
 public class RankerService {
     private final PageRepository pageRepository;
@@ -20,33 +23,45 @@ public class RankerService {
         this.pageRepository = pageRepository;
         this.wordRepository = wordRepository;
     }
-    public HashMap<String, ArrayList<Double>> startRanking(String token){
+    public HashMap<String, ArrayList<Double>> startRanking(String[] tokens){
+
+        List<Word> wordList = new ArrayList<Word>();
+        for (int i = 0; i < tokens.length; i++) {
+            System.out.println("debug1");
+            wordList.add(wordRepository.findWordByword(tokens[i]));
+        }
+
         sortedPageFinalScore = new ArrayList<>();
         pageTF_IDFScoreHashMap = new HashMap<>();
-        calculatePageFinalTF_IDF(token);
+        calculatePageFinalTF_IDF(wordList);
         calculatePageFinalTotalScore();
         sortPagesByFinalScore();
+//        HashMap<String, ArrayList<Double>> resultMap = new HashMap<>();
+//        for (Pair<String, ArrayList<Double>> pair : sortedPageFinalScore) {
+//            resultMap.put(pair.getKey(), pair.getValue());
+//        }
 
-        // Convert List<Pair<String, ArrayList<Double>>> to HashMap<String, ArrayList<Double>>
-        HashMap<String, ArrayList<Double>> resultMap = new HashMap<>();
-        for (Pair<String, ArrayList<Double>> pair : sortedPageFinalScore) {
-            resultMap.put(pair.getKey(), pair.getValue());
-        }
-        System.out.println(resultMap);
+        HashMap<String, ArrayList<Double>> resultMap = sortedPageFinalScore.stream()
+                .collect(Collectors.toMap(
+                        Pair::getKey, // Key mapper
+                        Pair::getValue, // Value mapper
+                        (oldValue, newValue) -> oldValue, // Merge function (if duplicate keys exist)
+                        HashMap::new // Supplier for the HashMap
+                ));
+
         return resultMap;
     }
-    private void calculatePageFinalTF_IDF(String relevantWord) {
+    private void calculatePageFinalTF_IDF(List<Word> relevantWords){
         String URL;
-        Optional<Word> wordObject = Optional.of(new Word());
-        wordObject = wordRepository.findWordByword(relevantWord);
         double TF_IDFScore;
-        if (wordObject.isPresent()) { // Check if the Optional contains a value
-            Word word = wordObject.get(); // Get the actual object from Optional
-            for (Map.Entry<String, ArrayList<Double>> TF_IDFAndOccurrences : word.getTF_IDFandOccurrences().entrySet()) {
-                URL = TF_IDFAndOccurrences.getKey().replace("__", ".");
-                if (!pageTF_IDFScoreHashMap.containsKey(URL)) {
-                    pageTF_IDFScoreHashMap.put(URL, TF_IDFAndOccurrences.getValue());
-                } else {
+        for(Word wordObject:relevantWords){
+            System.out.println("debug2");
+            for(Map.Entry<String,ArrayList<Double>> TF_IDFAndOccurrences:wordObject.getTF_IDFandOccurrences().entrySet()){
+                System.out.println("debug3");
+                URL=TF_IDFAndOccurrences.getKey().replace("__",".");
+                if(!pageTF_IDFScoreHashMap.containsKey(URL)){
+                    pageTF_IDFScoreHashMap.put(URL, TF_IDFAndOccurrences.getValue());                }
+                else{
                     TF_IDFScore = pageTF_IDFScoreHashMap.get(URL).get(0) + TF_IDFAndOccurrences.getValue().get(0);
                     ArrayList<Double> arrayList = new ArrayList<>();
                     arrayList = pageTF_IDFScoreHashMap.get(URL);
@@ -54,36 +69,39 @@ public class RankerService {
                     pageTF_IDFScoreHashMap.put(URL, arrayList);
                 }
             }
-
         }
     }
-    private void calculatePageFinalTotalScore(){
-        Page page;
-        int pagePopularity;
-        double pageFinalScore,pageTF_IDF;
-        for(Map.Entry<String,ArrayList<Double>>pairOfURLAndTF_IDF : pageTF_IDFScoreHashMap.entrySet()){
-            pageTF_IDF = pairOfURLAndTF_IDF.getValue().get(0);
-            page = pageRepository.findByNormlizedUrl(pairOfURLAndTF_IDF.getKey());
-            if(page!=null){
-                pagePopularity = page.getPopularity();
-                pageFinalScore = (pagePopularity*pageTF_IDF)/(pagePopularity+pageTF_IDF);
-                ArrayList<Double>arrayList=new ArrayList<>();
+    private void calculatePageFinalTotalScore() {
+        ConcurrentLinkedQueue<Pair<String, ArrayList<Double>>> concurrentSortedPageFinalScore = new ConcurrentLinkedQueue<>();
+
+        pageTF_IDFScoreHashMap.entrySet().parallelStream().forEach(pairOfURLAndTF_IDF -> {
+            System.out.println("debug4");
+            double pageTF_IDF = pairOfURLAndTF_IDF.getValue().get(0);
+            Page page = pageRepository.findByNormlizedUrl(pairOfURLAndTF_IDF.getKey());
+            if (page != null) {
+                int pagePopularity = page.getPopularity();
+                double pageFinalScore = pageTF_IDF;
+                ArrayList<Double> arrayList = new ArrayList<>();
                 arrayList.add(pageFinalScore);
                 pairOfURLAndTF_IDF.getValue().remove(0);
                 arrayList.addAll(pairOfURLAndTF_IDF.getValue());
                 pairOfURLAndTF_IDF.setValue(arrayList);
-                Pair<String,ArrayList<Double>> pair = new Pair<>(pairOfURLAndTF_IDF.getKey(),pairOfURLAndTF_IDF.getValue());
-                sortedPageFinalScore.add(pair);
+                Pair<String, ArrayList<Double>> pair = new Pair<>(pairOfURLAndTF_IDF.getKey(), pairOfURLAndTF_IDF.getValue());
+                concurrentSortedPageFinalScore.add(pair);
             }
-        }
+        });
+
+        sortedPageFinalScore = new ArrayList<>(concurrentSortedPageFinalScore);
     }
+
     private void sortPagesByFinalScore() {
         sortedPageFinalScore.sort((p1, p2) -> {
             double firstElementOfArray1 = p1.getValue().get(0);
             double firstElementOfArray2 = p2.getValue().get(0);
             return Double.compare(firstElementOfArray2, firstElementOfArray1);
         });
-    }    private void printPageFinalScore(){
+    }
+    private void printPageFinalScore(){
         for(Pair<String,ArrayList<Double>> pair:sortedPageFinalScore){
 
             System.out.println(pair.getKey()+"\t"+pair.getValue());

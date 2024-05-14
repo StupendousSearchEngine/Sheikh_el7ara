@@ -16,12 +16,12 @@ public class WordService {
     WordRepository wordRepository;
 
     public Optional<Word>  singleWord(String word){
-        return wordRepository.findWordByword(word);
+        return Optional.ofNullable(wordRepository.findWordByword(word));
     }
 
     public Word appendOccurrence(String wordStr, String occurrence) {
         // Find the Word object with the given word
-        Optional<Word> word = wordRepository.findWordByword(wordStr);
+        Optional<Word> word = Optional.ofNullable(wordRepository.findWordByword(wordStr));
 
         if (word.isPresent()) {
             Word acutualWord = word.get();
@@ -37,7 +37,7 @@ public class WordService {
 //            newWord.getOccurrences().put(occurrence);
 //            wordRepository.save(newWord);
         }
-        Word worrd = wordRepository.findWordByword(wordStr).get();
+        Word worrd = wordRepository.findWordByword(wordStr);
         return worrd;
     }
 }

@@ -105,11 +105,12 @@ async function getSearchResults() {
         } else loopCounter = displayItems;
         let result = [];
         for (let j = 0; j < loopCounter; j++) {
+          console.log("debug6");
           const [firstKey, firstValue] = myData.shift();
           result.push([firstKey, firstValue]);
         }
         resultsList.push(result);
-        console.log(resultsList);
+        // console.log(resultsList);
       }
       displaySearchResults();
     })
@@ -174,7 +175,7 @@ async function displaySearchResults() {
     card.appendChild(cardBody);
 
     searchResultsContainer.appendChild(card);
-    makeWordBoldId(cardText.id, searchTerm);
+    // makeWordBoldId(cardText.id, searchTerm);
     searchResultsContainer.replaceChild(card, card);
   }
   const Mtime_m = localStorage.getItem("Mtime_minutes");

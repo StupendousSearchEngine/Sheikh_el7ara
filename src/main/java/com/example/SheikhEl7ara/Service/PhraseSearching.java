@@ -1,4 +1,5 @@
 package com.example.SheikhEl7ara.Service;
+import com.example.SheikhEl7ara.Model.Page;
 import com.example.SheikhEl7ara.Repository.PageRepository;
 import com.example.SheikhEl7ara.Repository.WordRepository;
 //import javafx.util.Pair;
@@ -18,128 +19,99 @@ import java.util.regex.Pattern;
 
 @Service
 public class PhraseSearching {
+
     private final RankerService rankerService;
+    private final PageRepository pageRepository;
+
     @Autowired
     public PhraseSearching (RankerService rankerService, PageRepository pageRepository,WordRepository wordRepository)
     {
         this.rankerService=rankerService;
+        this.pageRepository = pageRepository;
+
     }
     public HashMap<String, String> logicOperation(String query, int op, String operator) {
 
 
         String q1,q2;
         int idx = query.indexOf(operator);
-       if (op==0)
-       {
+        if (op==0)
+        {
 
-           q1=query.substring(0,idx-2);
-           q2=query.substring(idx+4);
-           System.out.println("Query 1"+q1+" Query 2"+q2);
-       }
-       else
-       {
-           q1=query.substring(0,idx-2);
-           q2=query.substring(idx+5);
-           System.out.println("Query 1"+q1+" Query 2"+q2);
+            q1=query.substring(0,idx-2);
+            q2=query.substring(idx+4);
+            System.out.println("Query 1"+q1+" Query 2"+q2);
+        }
+        else
+        {
+            q1=query.substring(0,idx-2);
+            q2=query.substring(idx+5);
+            System.out.println("Query 1"+q1+" Query 2"+q2);
 
-       }
+        }
         String[] searchWordsQ1 = q1.split("\\s+");
         HashMap<String, ArrayList<Double>> query1Returns;
         System.out.println(Arrays.toString(searchWordsQ1));
         HashMap<String, String> allURLSQ1 = new HashMap<>();
-        for (int i = 0; i < searchWordsQ1.length; i++) {
-            query1Returns = this.rankerService.startRanking(searchWordsQ1[i]);
+        query1Returns = this.rankerService.startRanking(searchWordsQ1);
 
-            for (String key : query1Returns.keySet()) {
-                System.out.println(key);
+        for (String key : query1Returns.keySet()) {
+            System.out.println(key);
+            // Convert the body content back to a string if needed
+            Page p = pageRepository.findByNormlizedUrl(key);
+
+            String bodyString = "";
+            bodyString = p.getHtml();
 
 
-                Connection connect = Jsoup.connect(key);
+            // Iterate through <p> elements and extract their text
+            Pattern pattern = Pattern.compile(q1);
 
-                Document document = null;
-                try {
-                    document = connect.get();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
 
-                String html = document.html();
-                Document doc = Jsoup.parse(html);
+            Matcher matcher = pattern.matcher(bodyString);
 
-                // Extract the body content
-                Element body = doc.body();
-
-                // Convert the body content back to a string if needed
-                Elements paragraphs = body.select("p");
-
-                StringBuilder bodyString = new StringBuilder();
-                // Iterate through <p> elements and extract their text
-                Pattern pattern = Pattern.compile(q1);
-
-                for (Element paragraph : paragraphs) {
-                    String paragraphText = paragraph.text();
-                    Matcher matcher = pattern.matcher(paragraphText);
-
-                    if (matcher.find()) {
-                        bodyString.append(paragraphText).append("\n");
-
-                    }
-
-                }
-                if (!bodyString.isEmpty())
-                    allURLSQ1.put(key, bodyString.toString());
+            if (!matcher.find()) {
+                bodyString="";
 
             }
+
+
+            if (!bodyString.isEmpty())
+                allURLSQ1.put(key, bodyString);
         }
         String[] searchWordsQ2 = q2.split("\\s+");
 
         HashMap<String, ArrayList<Double>> query2Returns;
         System.out.println(Arrays.toString(searchWordsQ2));
         HashMap<String, String> allURLSQ2 = new HashMap<>();
-        for (int i = 0; i < searchWordsQ2.length; i++) {
-            query2Returns = this.rankerService.startRanking(searchWordsQ2[i]);
 
-            for (String key : query2Returns.keySet()) {
-                System.out.println(key);
+        query2Returns = this.rankerService.startRanking(searchWordsQ2);
+
+        for (String key : query2Returns.keySet()) {
+            System.out.println(key);
+            // Convert the body content back to a string if needed
+            Page p = pageRepository.findByNormlizedUrl(key);
+
+            String bodyString = "";
+            bodyString = p.getHtml();
 
 
-                Connection connect = Jsoup.connect(key);
+            // Iterate through <p> elements and extract their text
+            Pattern pattern = Pattern.compile(q2);
 
-                Document document = null;
-                try {
-                    document = connect.get();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
 
-                String html = document.html();
-                Document doc = Jsoup.parse(html);
+            Matcher matcher = pattern.matcher(bodyString);
 
-                // Extract the body content
-                Element body = doc.body();
-
-                // Convert the body content back to a string if needed
-                Elements paragraphs = body.select("p");
-
-                StringBuilder bodyString = new StringBuilder();
-                // Iterate through <p> elements and extract their text
-                Pattern pattern = Pattern.compile(q2);
-
-                for (Element paragraph : paragraphs) {
-                    String paragraphText = paragraph.text();
-                    Matcher matcher = pattern.matcher(paragraphText);
-
-                    if (matcher.find()) {
-                        bodyString.append(paragraphText).append("\n");
-
-                    }
-
-                }
-                if (!bodyString.isEmpty())
-                    allURLSQ2.put(key, bodyString.toString());
+            if (!matcher.find()) {
+                bodyString = "";
 
             }
+
+
+            if (!bodyString.isEmpty())
+                allURLSQ2.put(key, bodyString);
         }
+
         HashMap<String, String> allURLSQTotal = new HashMap<>();
 
         for (Map.Entry<String, String> entry : allURLSQ1.entrySet()) {
@@ -211,54 +183,36 @@ public class PhraseSearching {
 
         System.out.println("IN BIG FUNC"+Arrays.toString(searchWords));
         HashMap<String, String> allURLS = new HashMap<>();
-        for (int i = 0; i < searchWords.length; i++) {
-            //add this for now and try to modify it later as a list
-            /*if (searchWords[i].matches(".*\\d+.*"))
-                queryReturns=this.rankerService.startRanking(searchWords[i]);
-            else*/
-            queryReturns = this.rankerService.startRanking(searchWords[i]);
-
-            for (String key : queryReturns.keySet()) {
-                System.out.println(key);
+        queryReturns = this.rankerService.startRanking(searchWords);
 
 
-                Connection connect = Jsoup.connect(key);
 
-                Document document = null;
-                try {
-                    document = connect.get();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+        for (String key : queryReturns.keySet()) {
+            System.out.println(key);
+            // Convert the body content back to a string if needed
+            Page p = pageRepository.findByNormlizedUrl(key);
 
-                String html = document.html();
-                Document doc = Jsoup.parse(html);
+            String bodyString = "";
+            bodyString = p.getHtml();
 
-                // Extract the body content
-                Element body = doc.body();
 
-                // Convert the body content back to a string if needed
-                Elements paragraphs = body.select("p");
+            // Iterate through <p> elements and extract their text
+            Pattern pattern = Pattern.compile(query);
 
-                StringBuilder bodyString = new StringBuilder();
-                // Iterate through <p> elements and extract their text
-                Pattern pattern = Pattern.compile(query);
 
-                for (Element paragraph : paragraphs) {
-                    String paragraphText = paragraph.text();
-                    Matcher matcher = pattern.matcher(paragraphText);
+            Matcher matcher = pattern.matcher(bodyString);
 
-                    if (matcher.find()) {
-                        bodyString.append(paragraphText).append("\n");
-
-                    }
-
-                }
-                if (!bodyString.isEmpty())
-                    allURLS.put(key, bodyString.toString());
+            if (!matcher.find()) {
+                bodyString="";
 
             }
+
+
+            if (!bodyString.isEmpty())
+                allURLS.put(key, bodyString);
+
         }
+
         return allURLS;
     }
 }

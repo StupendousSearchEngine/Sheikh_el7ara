@@ -31,18 +31,20 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import com.example.SheikhEl7ara.Repository.PageRepository;
+import com.example.SheikhEl7ara.Repository.WordRepository;
+
 @Service
 public class QueryHandler {
     private final RankerService rankerService;
     private final PageRepository pageRepository;
 
-
-
     @Autowired
     public QueryHandler (RankerService rankerService, PageRepository pageRepository,WordRepository wordRepository)
     {
         this.rankerService=rankerService;
-        this.pageRepository = pageRepository;
+        this.pageRepository=pageRepository;
+
     }
     public static String findRoot(String searchWord) {
         // creates a StanfordCoreNLP object, with POS tagging, lemmatization, NER, parsing, and coreference resolution
@@ -86,54 +88,37 @@ public class QueryHandler {
 
         HashMap<String, ArrayList<Double>> queryReturns;
         String[] searchWords = searchWord.split("\\s+");
+
         System.out.println(Arrays.toString(searchWords));
-        HashMap<String, String> allURLS= new HashMap<>();
         for (int i = 0; i < searchWords.length; i++)
         {
-            //add this for now and try to modify it later as a list
-            /*if (searchWords[i].matches(".*\\d+.*"))
-                queryReturns=this.rankerService.startRanking(searchWords[i]);
-            else*/
-            queryReturns=this.rankerService.startRanking(findRoot(searchWords[i]));
-
-            for (String key : queryReturns.keySet()) {
-                System.out.println(key);
-
-                Page p = pageRepository.findByNormlizedUrl(key);
-
-                String bodyString = "";
-                bodyString = p.getHtml();
-//                Document doc = Jsoup.parse(html);
+            searchWords[i]=findRoot(searchWords[i]);
+        }
+        queryReturns=this.rankerService.startRanking(searchWords);
+        System.out.println("debuuuuuug");
+        System.out.println(queryReturns.toString());
+        HashMap<String, String> allURLS= new HashMap<>();
+        for (String key : queryReturns.keySet()) {
+//            System.out.println(key);
 
 
+            // Convert the body content back to a string if needed
+            Page p = pageRepository.findByNormlizedUrl(key);
 
-
-//                StringBuilder bodyString = new StringBuilder();
-                // Iterate through <p> elements and extract their text
-                Pattern pattern = Pattern.compile(searchWords[i]);
-                Pattern pattern_processed = Pattern.compile(findRoot(searchWords[i]));
+            String bodyString = "";
+            bodyString = p.getHtml();
 
 
 
-//                for (Element paragraph : paragraphs) {
-//                    String paragraphText = paragraph.text();
-//                    Matcher matcher = pattern.matcher(paragraphText);
-//                    Matcher matcher_processed = pattern_processed.matcher(paragraphText);
-//                    if (matcher.find() || matcher_processed.find()) {
-//                        bodyString.append(paragraphText).append("\n");
-//
-//                    }
-//
-//                }
 
 
 
-                allURLS.put(key, bodyString);
+            allURLS.put(key, bodyString);
 
-
-            }
 
         }
+
+
 
         return (allURLS);
 

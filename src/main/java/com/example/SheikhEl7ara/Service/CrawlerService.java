@@ -54,6 +54,7 @@ public class CrawlerService {
             System.out.println("thread started");
             while(numOfCrawledPages.get() <= maxNumOfPages) {
                 String url = urlsToVisit.poll();
+
                 if (url == null) {
                     System.out.println("the queue is empty exiting");
                     return ;
@@ -80,7 +81,8 @@ public class CrawlerService {
                 try{
 
                     // if we see this url before
-                    if(visitedUrls.putIfAbsent(normlizedUrl,true) != null){
+
+                    if(visitedUrls.putIfAbsent(normlizedUrl,true) != null ){
                         System.out.println("found the same url before in this crawling");
                         continue;
                     }
@@ -88,7 +90,9 @@ public class CrawlerService {
                     Page page = pageRepository.findByNormlizedUrl(normlizedUrl);
                     // if we added the page in the DB in previous crawl
                     if(page!=null){
-                        page.setPopularity(page.getPopularity()+1);
+                        int pop = page.getPopularity();
+                        System.out.println(pop);
+                        page.setPopularity(pop+1);
                         pageRepository.save(page);
                         continue;
                     }
@@ -106,7 +110,7 @@ public class CrawlerService {
                     newPage.setUrl(url);
                     newPage.setNormlizedUrl(normlizedUrl);
                     newPage.setPopularity(1);
-                    newPage.setHtml(document.body().select("p").text());
+                    newPage.setHtml(document.body().select("p, h1, h2, h3, h4, h5, h6, span, title, td, li").text());
                     System.out.println("saving page with normlized url:"+ normlizedUrl);
                     pageRepository.save(newPage);
 
